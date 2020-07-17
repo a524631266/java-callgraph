@@ -22,10 +22,12 @@ public class JassistTiming {
                 // 2. 添加冬天类习惯
                 addTiming(ctClass, argv[1]);
                 ctClass.writeFile();
+                // 再次获取就是为修改之后的类。全部都是引用
+                CtClass ctClass2 = ClassPool.getDefault().get(argv[0]);
 //                Stream.of(ctClass.getDeclaredMethods())
 //                        .peek(method -> System.out.println("method::::"+method.getName()))
 //                        .collect(Collectors.toList());
-                Class aClass = ctClass.toClass();
+                Class aClass = ctClass2.toClass();
                 Method main = aClass.getMethod("main",String[].class);
 
                 main.invoke(aClass.newInstance(),
@@ -72,7 +74,7 @@ public class JassistTiming {
 //        System.out.println("Call to buildString took " + (System.currentTimeMillis()-start) + " ms.");
 //        return result;
 //    }
-    private static void addTiming(CtClass aClass, String oldMethodName) throws NotFoundException, CannotCompileException {
+    public static void addTiming(CtClass aClass, String oldMethodName) throws NotFoundException, CannotCompileException {
         CtMethod oldMethod = aClass.getDeclaredMethod(oldMethodName);
 
         // 1. 改名字
@@ -91,8 +93,8 @@ public class JassistTiming {
         String returnType = oldMethod.getReturnType().getName();
         if(!returnType.equals("void")){
             // $$代表输入参数
-//            body.append(returnType+ " result = ");
-            body.append("int result = ");
+            body.append(returnType+ " result = ");
+//            body.append("int result = ");
         }
         body.append(newMethodName + "($$);\n");
         body.append("System.out.println(\"Call to method " + oldMethodName +
