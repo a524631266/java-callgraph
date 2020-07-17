@@ -43,6 +43,9 @@ public class JavassistRun {
         }
     }
 
+    /**
+     * gr.zhangll.javadynamic.part01.javassist.StringBuilderDemo buildString 1000 2000 3000
+     */
     public static class SimpleTranslator implements Translator {
 
         private final String m_className;
@@ -65,6 +68,67 @@ public class JavassistRun {
             if(classname == m_className){
                 addTiming(pool.get(m_className), m_methodName);
             }
+        }
+    }
+
+
+    public static class RegrexMethodTranslator implements Translator {
+
+        private final String m_className;
+        private  final String m_methodName;
+
+        public RegrexMethodTranslator(String m_className, String m_methodName) {
+            this.m_className = m_className;
+            this.m_methodName = m_methodName;
+        }
+
+
+        @Override
+        public void start(ClassPool pool) throws NotFoundException, CannotCompileException {
+
+        }
+
+        /**
+         * 选择类型中的名称
+         * java.lang.String test.StringBuilder.buildString(int)
+         * test.StringBuilder.buildString(int)
+         * *buildString(int)
+         * *buildString
+         * @param pool
+         * @param classname
+         * @throws NotFoundException
+         * @throws CannotCompileException
+         */
+        @Override
+        public void onLoad(ClassPool pool, String classname) throws NotFoundException, CannotCompileException {
+            System.out.println("onWrite called for " + classname);
+            if(classname == m_className){
+                CtClass ctClass = pool.get(m_className);
+                CtMethod[] declaredMethods = ctClass.getDeclaredMethods();
+                for (CtMethod declaredMethod : declaredMethods) {
+                    if(matchMethodName(declaredMethod) &&
+                            matchParameter(declaredMethod) &&
+                            matchReturnType(declaredMethod)){
+                        addTiming(pool.get(m_className), m_methodName);
+                    }
+                }
+            }
+        }
+
+        private boolean matchReturnType(CtMethod declaredMethod) {
+            // 。。。。
+            // m_methodName
+            return false;
+        }
+
+        private boolean matchParameter(CtMethod declaredMethod) {
+            // 。。。
+            return false;
+        }
+
+        private boolean matchMethodName(CtMethod declaredMethod) {
+            // 。。。
+            return false;
         }
     }
 }
